@@ -62,12 +62,41 @@ GROUP BY order_id  )  AS table1  ;
 
 -- 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 
+SELECT  
+		SUM( iif(exclusions NOT LIKE '' OR extras NOT LIKE '',1,0))  AS at_least_1_changes,
+		SUM( iif(exclusions LIKE '' AND extras LIKE '', 1, 0))  AS at_least_1_changes
+FROM tempdb.##customer_orders_temp  ;
 -- 8. How many pizzas were delivered that had both exclusions and extras?
+SELECT  
+		SUM( iif(exclusions NOT LIKE '' AND extras NOT LIKE '', 1, 0))  AS at_least_1_changes
+FROM tempdb.##customer_orders_temp  ;
 
 -- 9. What was the total volume of pizzas ordered for each hour of the day?
 
--- 10. What was the volume of orders for each day of the week?
+SELECT DATEPART(YEAR, order_time) AS year,
+       DATEPART(MONTH, order_time) AS month,
+       DATEPART(DAY, order_time) AS day,
+       DATEPART(HOUR, order_time) AS hour,
+	   COUNT(pizza_id) AS total_volume
+FROM tempdb.##customer_orders_temp C
+GROUP BY DATEPART(YEAR, order_time),
+         DATEPART(MONTH, order_time),
+         DATEPART(DAY, order_time),
+         DATEPART(HOUR, order_time)
+ORDER BY year, month, day, hour;
 
+-- 10. What was the volume of orders for each day of the week?
+SELECT DATEPART(YEAR, order_time) AS year,
+       DATEPART(MONTH, order_time) AS month,
+       DATEPART(DAY, order_time) AS day,
+	   DATEPART(WEEKDAY,order_time) AS day_of_week,
+	   COUNT(pizza_id) AS total_volume
+FROM tempdb.##customer_orders_temp C
+GROUP BY DATEPART(YEAR, order_time),
+         DATEPART(MONTH, order_time),
+         DATEPART(DAY, order_time),
+		 DATEPART(dw,order_time)
+ORDER BY year, month, day,day_of_week;
 
 -- B. Runner and Customer Experience
 -------------
