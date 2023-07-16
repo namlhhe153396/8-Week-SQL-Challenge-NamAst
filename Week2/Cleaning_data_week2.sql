@@ -1,3 +1,4 @@
+USE Data8WeekSQLChallenge ; 
 -- Table 1: runners
 SELECT * 
 from runners ;
